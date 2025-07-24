@@ -1,0 +1,191 @@
+/* スマホ及び共通設定 */
+li {
+  color: #6a7375;
+}
+
+p {
+  font-size: 1.05em;
+  color: #6a7375;
+}
+
+h1 {
+  font-size: 23px;
+  color: #fff;
+}
+
+h2 {
+  font-size: 36px;
+  color: #202b3e;
+  font-weight: 600;
+  border-bottom: 1px solid #000;
+}
+
+h3 {
+  font-size: 1.1em;
+  color: #1e2731;
+}
+
+body {
+  display: grid;
+}
+
+header {
+  padding: 0 4%;
+  display: flex;
+  justify-content: space-between;
+}
+
+header h1 {
+  background-color: #384052;
+  padding: 8px 15px;
+  margin: 9px 0 8px 3%;
+}
+
+header ul {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  padding: 0 1% 0 0;
+}
+
+header .li-left {
+  padding-right: 31px;
+}
+
+.main-visual {
+  background-image: url(../images/1920x1280.png);
+  height: 600px;
+  background-size: cover;
+  background-position: center;
+  margin: 0 0 84px 0;
+  width: 100%;
+}
+
+.main-content {
+  padding: 0 4%;
+}
+
+.intro-container {
+  display: grid;
+  margin-bottom: 100px;
+}
+
+.intro-container h2 {
+  margin: 0 auto 52px;
+  padding-bottom: 6px;
+}
+
+.intro-text {
+  display: grid;
+}
+
+.intro-text h3 {
+  margin: 0 auto 14px;
+}
+
+.intro-text p {
+  margin: 0 auto 8px;
+  line-height: 1.45;
+}
+
+.intro-text img {
+  margin: 0 auto;
+  border-radius: 50%;
+  width: 30%;
+}
+
+.prof-container {
+  display: grid;
+  margin-bottom: 88px;
+}
+
+.prof-container h2 {
+  margin: 0 auto 52px;
+  padding-bottom: 6px;
+  display: grid;
+}
+
+.prof-img {
+  display: grid;
+  margin-bottom: 20px;
+}
+
+.prof-img h3 {
+  margin: 0 auto 14px;
+}
+
+.prof-img p {
+  margin: 0 auto 8px;
+  line-height: 1.45;
+}
+
+.prof-img img {
+  width: 100%;
+}
+
+footer p {
+  text-align: center;
+  font-size: 11px;
+  margin: 5px 0 6px 0;
+}
+
+/*PCサイズの設定*/
+@media screen and (min-width: 600px) {
+  body {
+    grid-template-columns: 1fr 960px 1fr;
+  }
+
+  header {
+    grid-column: 2;
+  }
+
+  header h1 {
+    margin-left: 1%;
+  }
+
+  header ul {
+    margin-right: -1%;
+  }
+
+  .main-visual {
+    grid-column: 1 / 4;
+  }
+
+  .main-content {
+    grid-column: 2;
+  }
+
+  .intro-text {
+    grid-template-columns: 80% 1fr;
+    padding: 0 5%;
+  }
+
+  .intro-text h3 {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0 0 14px 0;
+  }
+
+  .intro-text p {
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0 0 14px 0;
+  }
+
+  .intro-text img {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    width: 61.1%;
+    margin: 0 0 33px 61px;
+  }
+
+  .prof-img-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0 17px;
+  }
+
+  footer {
+    grid-column: 2;
+  }
+}
