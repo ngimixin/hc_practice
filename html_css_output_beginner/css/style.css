@@ -33,23 +33,21 @@ header {
   padding: 0 4%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  height: 59px;
 }
 
 header h1 {
   background-color: #384052;
   padding: 8px 15px;
-  margin: 9px 0 8px 3%;
+  margin: 0 0 0 3%;
 }
 
 header ul {
   list-style: none;
   display: flex;
-  align-items: center;
   padding: 0 1% 0 0;
-}
-
-header .li-left {
-  padding-right: 31px;
+  gap: 31px;
 }
 
 .main-visual {
