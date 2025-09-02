@@ -19,8 +19,6 @@ def split_group():
 
 
 if __name__ == "__main__":
-    for _ in range(5):
-        g1, g2 = split_group()
-        print(g1)
-        print(g2)
-        print("-----")
+    g1, g2 = split_group()
+    print(g1)
+    print(g2)
