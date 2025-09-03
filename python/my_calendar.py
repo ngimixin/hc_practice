@@ -27,7 +27,7 @@ def main():
     this_month_jp = str(begining_of_month.month) + "月"
     first_weekday = begining_of_month.weekday()
     first_weekday_jp = day_of_week_l[first_weekday]
-    week = " ".join(day_of_week_l)
+    week_column = " ".join(day_of_week_l)
     
     # 月末算出（閏年か考慮）
     if is_leap_year(this_year):
@@ -45,15 +45,39 @@ def main():
     
 
     print(f"     {this_month_jp} 2025")
-    print(week)
+    print(week_column)
+    generate_monthly_weeks(first_weekday, end_of_month)
+    
+# 曜日出力用関数
+def generate_monthly_weeks(first_weekday, end_of_month):
+    l = [v for v in range(1, end_of_month+1)]
+    for i in range(5):
+        l.insert(0, "  ")
+
+    l2 = [[], [], [], [], []]
+    j = 1
+    for i2 in l:
+        if j >= 1 and j <= 7:
+            l2[0].append(i2)
+        elif j >= 8 and j <= 14:
+            l2[1].append(i2)
+        elif j >= 15 and j <= 21:
+            l2[2].append(i2)
+        elif j >= 22 and j <= 28:
+            l2[3].append(i2)
+        elif j >= 29 and j <= 37:
+            l2[4].append(i2)
+        j += 1
+    print(l2)
+        
 
 
 
 # 閏年判定関数
-def is_leap_year(year):
-    if year % 4 == 0:
-        if year % 100 == 0:
-            if year % 400 == 0:
+def is_leap_year(this_year):
+    if this_year % 4 == 0:
+        if this_year % 100 == 0:
+            if this_year % 400 == 0:
                 return True
             else:
                 return False
