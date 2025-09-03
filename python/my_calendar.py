@@ -48,44 +48,23 @@ def main():
     print(week_column)
     generate_monthly_weeks(first_weekday, end_of_month)
     
-# 一ヶ月の日数を4ないし5週間に分割し2次元リストにする関数
+# 一ヶ月の日数を5ないし6週間に分割し2次元リストにする関数
 def generate_monthly_weeks(first_weekday, end_of_month):
     l = [v for v in range(1, end_of_month+1)]
     for i in range(first_weekday):
         l.insert(0, "  ")
 
-    l2 = [[], [], [], [], []]
-    j = 0
+    l2 = [[], [], [], [], [], []]
     my_iter = iter(l)
-    # for i2 in l:
-    #     if j >= 1 and j <= 7:
-    #         l2[0].append(i2)
-    #     elif j >= 8 and j <= 14:
-    #         l2[1].append(i2)
-    #     elif j >= 15 and j <= 21:
-    #         l2[2].append(i2)
-    #     elif j >= 22 and j <= 28:
-    #         l2[3].append(i2)
-    #     elif j >= 29 and j <= 37:
-    #         l2[4].append(i2)
-    #     j += 1
-    # print(l2)
-
-    # while l:
     try:
-        while len(l2[j]) < 7:
-            l2[j].append(next(my_iter))        
-            # print(l2)
-            if len(l2[j]) == 7:
-                j += 1
+        for j in range(6):
+            while len(l2[j]) < 7:
+                l2[j].append(next(my_iter))        
     except StopIteration:
         raise
     finally:
         print(l2)
         return l2
-
-    # print(l2)
-
 
 
 # 閏年判定関数
