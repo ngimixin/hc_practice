@@ -51,7 +51,7 @@ def main():
 # 一ヶ月の日数を4ないし5週間に分割し2次元リストにする関数
 def generate_monthly_weeks(first_weekday, end_of_month):
     l = [v for v in range(1, end_of_month+1)]
-    for i in range(5):
+    for i in range(first_weekday):
         l.insert(0, "  ")
 
     l2 = [[], [], [], [], []]
@@ -71,18 +71,18 @@ def generate_monthly_weeks(first_weekday, end_of_month):
     #     j += 1
     # print(l2)
 
-    while l:
-        try:
-            while len(l2[j]) < 7:
-                l2[j].append(next(my_iter))        
-                # print(l2)
-                if len(l2[j]) == 7:
-                    j += 1
-        except StopIteration:
-            raise
-        finally:
-            print(l2)
-            return l2
+    # while l:
+    try:
+        while len(l2[j]) < 7:
+            l2[j].append(next(my_iter))        
+            # print(l2)
+            if len(l2[j]) == 7:
+                j += 1
+    except StopIteration:
+        raise
+    finally:
+        print(l2)
+        return l2
 
     # print(l2)
 
@@ -103,3 +103,5 @@ def is_leap_year(this_year):
 
 if __name__ == "__main__":
     main()
+
+# TODO: cmd+d を　fn+f2と同じ動作にカスタムする
