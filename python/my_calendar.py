@@ -50,21 +50,21 @@ def main():
     
 # 一ヶ月の日数を5ないし6週間に分割し2次元リストにする関数
 def generate_monthly_weeks(first_weekday, end_of_month):
-    l = [v for v in range(1, end_of_month+1)]
-    for i in range(first_weekday):
-        l.insert(0, "  ")
+    days = [v for v in range(1, end_of_month+1)]
+    for _ in range(first_weekday):
+        days.insert(0, "") # type: ignore  # Pylance の誤検知を無視
 
-    l2 = [[], [], [], [], [], []]
-    my_iter = iter(l)
+    weeks = [[], [], [], [], [], []]
+    days_iter = iter(days)
     try:
         for j in range(6):
-            while len(l2[j]) < 7:
-                l2[j].append(next(my_iter))        
+            while len(weeks[j]) < 7:
+                weeks[j].append(next(days_iter))        
     except StopIteration:
         raise
     finally:
-        print(l2)
-        return l2
+        print(weeks)
+        return weeks
 
 
 # 閏年判定関数
