@@ -1,4 +1,4 @@
 .DS_Store
 
-# ローカルテスト用
-test.py
+# ローカルテスト用ファイルは無視
+python/test.py
