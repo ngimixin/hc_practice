@@ -2,3 +2,6 @@
 
 # ローカルテスト用ファイルは無視
 python/test.py
+
+# プロジェクトルート直下の python/test ディレクトリを無視する
+/python/test/
