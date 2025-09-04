@@ -3,12 +3,10 @@ from datetime import datetime, timedelta
 
 
 day_of_week_l = ["月", "火", "水", "木", "金", "土", "日"]
-
 end_of_month_d = {28: [2],
                 30: [4, 6, 9, 11],
                 31: [1, 3, 5, 7, 8, 10, 12]}
-
-input_date = None;
+input_date = None
 
 def main():
     # print(sys.argv) 
@@ -18,10 +16,13 @@ def main():
         # begining_of_month = input_date.replace(day=1)
     # コマンドライン実行の場合
     else:
-        if sys.argv[1] == "-m":
+        if sys.argv[1] == "-m" and int(sys.argv[2]) >= 1 and int(sys.argv[2]) <= 12:
             input_date = datetime(2025, int(sys.argv[2]), 1)
+# TODO: エラー時の処理はあとで追加
+# print(f"{int(sys.argv[2])}")
+                
 
-    begining_of_month = input_date
+    begining_of_month = input_date # type: ignore  # Pylance の誤検知を無視
     this_year = begining_of_month.year
     this_month = begining_of_month.month
     this_month_jp = str(begining_of_month.month) + "月"
@@ -36,6 +37,10 @@ def main():
         key = [k for k, v in end_of_month_d.items() if this_month in v]
         end_of_month = key[0]
         
+    weeks_l = generate_monthly_weeks(first_weekday, end_of_month)
+    weeks_str_l = [[], [], [], [], [], []]
+    for i in range(len(weeks_l)):
+        weeks_str_l[i].append(" ".join(weeks_l[i]))
 
     print(f"今年：{this_year}")
     print(f"今月：{this_month_jp}")
@@ -46,25 +51,26 @@ def main():
 
     print(f"     {this_month_jp} 2025")
     print(week_column)
-    generate_monthly_weeks(first_weekday, end_of_month)
-    
+    for i in weeks_str_l:
+        print(i[0])
+
+
 # 一ヶ月の日数を5ないし6週間に分割し2次元リストにする関数
 def generate_monthly_weeks(first_weekday, end_of_month):
-    days = [v for v in range(1, end_of_month+1)]
+    days = [f"{v:02}" for v in range(1, end_of_month+1)]
     for _ in range(first_weekday):
-        days.insert(0, "") # type: ignore  # Pylance の誤検知を無視
+        days.insert(0, "  ") # type: ignore  # Pylance の誤検知を無視
 
-    weeks = [[], [], [], [], [], []]
+    weeks_l = [[], [], [], [], [], []]
     days_iter = iter(days)
     try:
         for j in range(6):
-            while len(weeks[j]) < 7:
-                weeks[j].append(next(days_iter))        
+            while len(weeks_l[j]) < 7:
+                weeks_l[j].append(next(days_iter))        
     except StopIteration:
         raise
     finally:
-        print(weeks)
-        return weeks
+        return weeks_l
 
 
 # 閏年判定関数
@@ -83,4 +89,3 @@ def is_leap_year(this_year):
 if __name__ == "__main__":
     main()
 
-# TODO: cmd+d を　fn+f2と同じ動作にカスタムする
