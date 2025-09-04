@@ -9,7 +9,6 @@ end_of_month_d = {28: [2],
 input_date = None
 
 def main():
-    # print(sys.argv) 
     #エディタから実行の場合
     if len(sys.argv) == 1:
         input_date = datetime.today().replace(day=1)
@@ -18,8 +17,9 @@ def main():
     else:
         if sys.argv[1] == "-m" and int(sys.argv[2]) >= 1 and int(sys.argv[2]) <= 12:
             input_date = datetime(2025, int(sys.argv[2]), 1)
-# TODO: エラー時の処理はあとで追加
-# print(f"{int(sys.argv[2])}")
+
+    # TODO: エラー時の処理はあとで追加
+    # print(f"{int(sys.argv[2])}")
                 
 
     begining_of_month = input_date # type: ignore  # Pylance の誤検知を無視
@@ -41,13 +41,6 @@ def main():
     weeks_str_l = [[], [], [], [], [], []]
     for i in range(len(weeks_l)):
         weeks_str_l[i].append(" ".join(weeks_l[i]))
-
-    print(f"今年：{this_year}")
-    print(f"今月：{this_month_jp}")
-    print(f"月初曜日：{first_weekday_jp}")
-    print(f"月初：{begining_of_month}")
-    print(f"月末：{end_of_month}")
-    
 
     print(f"     {this_month_jp} 2025")
     print(week_column)
@@ -89,3 +82,9 @@ def is_leap_year(this_year):
 if __name__ == "__main__":
     main()
 
+
+# print(f"今年：{this_year}")
+# print(f"今月：{this_month_jp}")
+# print(f"月初曜日：{first_weekday_jp}")
+# print(f"月初：{begining_of_month}")
+# print(f"月末：{end_of_month}")
