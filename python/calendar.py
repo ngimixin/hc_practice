@@ -33,6 +33,7 @@ def parse_args() -> tuple[datetime, int | None]:
         tuple[datetime, int | None]: (表示対象の月初, ハイライトする「日」または None)
     """
     today = datetime.today()
+
     if len(sys.argv) >= 2 and sys.argv[1] == "-m":
         if len(sys.argv) < 3:
             print(f"is neither a month number (1..12) nor a name")
@@ -45,7 +46,6 @@ def parse_args() -> tuple[datetime, int | None]:
         if not (1 <= m <= 12):
             print(f"{sys.argv[2]} is neither a month number (1..12) nor a name")
             sys.exit(1)
-
         beginning_of_month = today.replace(month=m, day=1)
         highlight_day = today.day if today.month == m else None
         return beginning_of_month, highlight_day
@@ -145,10 +145,8 @@ def main() -> None:
     """
 
     beginning_of_month, highlight_day = parse_args()
-    first_weekday = beginning_of_month.weekday()
-    this_year = beginning_of_month.year
-    this_month = beginning_of_month.month
-    this_month_jp = f"{beginning_of_month.month}月"
+    first_weekday, this_year, this_month = beginning_of_month.weekday(), beginning_of_month.year, beginning_of_month.month 
+    this_month_jp = f"{this_month}月"
 
     # 月末算出（閏年か考慮）
     if this_month == 2:
