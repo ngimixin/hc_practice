@@ -16,38 +16,49 @@ class Color:
 
 
 def parse_args() -> tuple[datetime, int | None]:
-    """コマンドライン引数を解析し、表示対象の月初とハイライト対象の「日」を返す。
+    """コマンドライン引数を解析し、(表示対象の月初, ハイライトする日) を返す。
 
-    仕様:
-        - `-m <1..12>` が指定された場合:
-            * その月の1日を「表示対象の月初」として返す。
-            * もし <m> が「今月」なら当日をハイライト対象として返す（int）。
-            * それ以外の月ならハイライトなし（None）を返す。
-        - 引数なしの場合:
-            * 今月の1日を「表示対象の月初」とし、当日をハイライト対象として返す。
-
-        - <m> が数値でない／1..12の範囲外のときはエラーメッセージを出力して
-          終了コード 1 でプロセスを終了する。
+    挙動:
+        - 引数なし:
+            今月の1日と、今日の日付（ハイライト）を返す。
+        - `-m <1..12>`:
+            指定月の1日を返す。指定月が「今月」なら今日をハイライト、それ以外は None。
+        - エラー時:
+            * `-m` 以外のオプションが来たら:  "illegal option -- <文字>" を表示して終了(1)。
+            * `-m` の値が無い/数値でない/1..12 範囲外/余計な引数あり:
+                "is neither a month number (1..12) nor a name" を表示して終了(1)。
 
     Returns:
         tuple[datetime, int | None]: (表示対象の月初, ハイライトする「日」または None)
     """
     today = datetime.today()
 
-    if len(sys.argv) >= 2 and sys.argv[1] == "-m":
-        if len(sys.argv) < 3:
-            print(f"is neither a month number (1..12) nor a name")
+    if len(sys.argv) >= 2:
+        _ , m_option, *month_arg = sys.argv
+
+        if m_option != "-m":
+            if m_option.startswith("-"):
+                print(f"illegal option -- {m_option.lstrip('-')}")
+            else:
+                print("is neither a month number (1..12) nor a name")
             sys.exit(1)
+
+        if len(month_arg) != 1:
+            print("is neither a month number (1..12) nor a name")
+            sys.exit(1)
+
         try:
-            m = int(sys.argv[2])
+            int_month = int(month_arg[0])
         except ValueError:
-            print(f"{sys.argv[2]} is neither a month number (1..12) nor a name")
+            print(f"{month_arg[0]} is neither a month number (1..12) nor a name")
             sys.exit(1)
-        if not (1 <= m <= 12):
-            print(f"{sys.argv[2]} is neither a month number (1..12) nor a name")
+
+        if not (1 <= int_month <= 12):
+            print(f"{int_month} is neither a month number (1..12) nor a name")
             sys.exit(1)
-        beginning_of_month = today.replace(month=m, day=1)
-        highlight_day = today.day if today.month == m else None
+
+        beginning_of_month = today.replace(month=int_month, day=1)
+        highlight_day = today.day if today.month == int_month else None
         return beginning_of_month, highlight_day
 
     # 引数なしの場合
