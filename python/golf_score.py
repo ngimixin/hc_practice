@@ -40,9 +40,10 @@ from pathlib import Path
 
 
 # --- type aliases ---
-Row: TypeAlias   = list[int]       # 18個想定
-Case: TypeAlias  = list[Row]       # 2行想定（pars, strokes）
-Cases: TypeAlias = list[Case]      # 複数ケース
+Row: TypeAlias = list[int]  # 18個想定
+Case: TypeAlias = list[Row]  # 2行想定（pars, strokes）
+Cases: TypeAlias = list[Case]  # 複数ケース
+
 
 class Score(Enum):
     BOGEY = 1
@@ -52,13 +53,14 @@ class Score(Enum):
     ALBATROSS = -3
     CONDOR = -4
 
+
 SCORE_LABELS: dict[Score, str] = {
     Score.BOGEY: "ボギー",
     Score.PAR: "パー",
     Score.BIRDIE: "バーディ",
     Score.EAGLE: "イーグル",
     Score.ALBATROSS: "アルバトロス",
-    Score.CONDOR: "コンドル"
+    Score.CONDOR: "コンドル",
 }
 
 # --- Outcome 型（タグ付きタプル）---
@@ -87,16 +89,17 @@ def parse_two_lines(stream: TextIO) -> Case:
         Case: 標準入力から読み込んだ 1ケース（[pars, strokes]）。
     """
     lines = stream.readlines()
-    case_rows_strs = [l.rstrip("\n").split(",") for l in lines]
+    case_rows_strs = [line.rstrip("\n").split(",") for line in lines]
 
     try:
-        case: Case = [[int(s) for s in l] for l in case_rows_strs]
+        case: Case = [[int(s) for s in line] for line in case_rows_strs]
     except ValueError as e:
-        print(f"入力データに問題があります。")
+        print("入力データに問題があります。")
         print(f"詳細: {e}")
         sys.exit(1)
 
     return case
+
 
 def read_input() -> tuple[list[str], Cases]:
     """./tests/*.txt をファイル名の昇順リストで取得し、
@@ -111,7 +114,7 @@ def read_input() -> tuple[list[str], Cases]:
         - int変換に失敗した場合はメッセージを表示して終了コード 1 で終了。
 
     Returns:
-        tuple[list[str], Cases]: 
+        tuple[list[str], Cases]:
             - list[str]: 読み込んだファイルパスのリスト（昇順）
             - Cases:     各ファイルから得た Case を並べたリスト
     """
@@ -121,11 +124,11 @@ def read_input() -> tuple[list[str], Cases]:
     for i, file_path in enumerate(file_list):
         with open(file_path, "r") as f:
             lines = f.readlines()
-            case_rows_strs[i] = [l.rstrip("\n").split(",") for l in lines]
+            case_rows_strs[i] = [line.rstrip("\n").split(",") for line in lines]
     try:
-        cases = [[[int(s) for s in l2] for l2 in l] for l in case_rows_strs]
+        cases = [[[int(s) for s in line2] for line2 in line] for line in case_rows_strs]
     except ValueError as e:
-        print(f"入力データに問題があります。")
+        print("入力データに問題があります。")
         print(f"詳細: {e}")
         sys.exit(1)
     return file_list, cases
@@ -144,6 +147,7 @@ def judge_outcomes(cases: Cases) -> list[list[Outcome]]:
     Returns:
         list[list[Outcome]]: cases（ケース配列）× 18ホールの Outcome 二次元リスト。
     """
+
     def judge_one(par: int, stroke: int) -> Outcome:
         diff = stroke - par
 
@@ -189,9 +193,11 @@ def format_outcomes_jp(outcomes: list[list[Outcome]]) -> list[list[str]]:
         for outcome in row:
             match outcome:
                 case ("enum", score):
-                    row_labels.append(SCORE_LABELS[score])   # score は Score と推論される
+                    row_labels.append(
+                        SCORE_LABELS[score]
+                    )  # score は Score と推論される
                 case ("multi_bogey", n):
-                    row_labels.append(f"{n}ボギー")          # n は int
+                    row_labels.append(f"{n}ボギー")  # n は int
                 case ("hole_in_one",):
                     row_labels.append("ホールインワン")
         labels.append(row_labels)
