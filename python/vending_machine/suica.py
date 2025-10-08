@@ -19,7 +19,17 @@ class InsufficientBalanceError(ValueError):
     def __str__(self):
         return f"{self.args[0]}（必要額: {self.required_amount}円 / 残高: {self.balance}円）"
 class Suica:
-    # デポジット500円は定義しているがSuica残高とは別ものなので今回未使用
+    """Suica（実物準拠の仕様）
+
+    Notes:
+        デポジット(500円)は「預かり金」。支払い・チャージの計算には含めない。
+        返却時の返金対象として別管理する（本課題では未使用）。
+
+    Attributes:
+        DEPOSIT (int): 500。預かり金（利用不可）。
+        MIN_CHARGE (int): 最小チャージ額。
+        MAX_BALANCE (int): 利用可能残高の上限。
+    """
     DEPOSIT = 500
     MIN_CHARGE = 100
     MAX_BALANCE = 20000
