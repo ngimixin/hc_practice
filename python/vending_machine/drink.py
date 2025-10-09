@@ -11,6 +11,8 @@ class Drink:
     def price(self):
         return self.__price
     
-    # デバッグ用
     def __str__(self):
-        return f"{self.brand}（{self.price}円）"
+        return f"{self.brand}"
+
+    def __repr__(self):
+        return f"Drink(brand={self.brand!r}, price={self.price!r})"
