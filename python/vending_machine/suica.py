@@ -36,7 +36,7 @@ class Suica:
 
     def __init__(self, balance=0):
         # 生成時の保証：初期値の妥当性
-        if balance < 0 or balance > self.MAX_BALANCE:
+        if balance < 0 or balance > Suica.MAX_BALANCE:
             raise ValueError("不正な初期残高です。")
         self.__balance = balance
 
@@ -57,11 +57,11 @@ class Suica:
     def _update_balance(self, amount):
         # チャージ処理
         if amount >= 0:
-            if amount < self.MIN_CHARGE:
-                raise InvalidChargeAmountError(amount, self.balance, f"{self.MIN_CHARGE}円以上の額をチャージして下さい。")
+            if amount < Suica.MIN_CHARGE:
+                raise InvalidChargeAmountError(amount, self.balance, f"{Suica.MIN_CHARGE}円以上の額をチャージして下さい。")
             new_balance = self.balance + amount
-            if new_balance > self.MAX_BALANCE:
-                raise InvalidChargeAmountError(amount, self.balance, f"チャージ上限額（{self.MAX_BALANCE}円）を超えています。")
+            if new_balance > Suica.MAX_BALANCE:
+                raise InvalidChargeAmountError(amount, self.balance, f"チャージ上限額（{Suica.MAX_BALANCE}円）を超えています。")
             self.balance = new_balance
         # 支払い処理
         else:
