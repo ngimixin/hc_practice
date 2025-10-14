@@ -51,14 +51,14 @@ class VendingMachine:
         """
         self.__total_amount = amount
 
-    def register_brand(self, target_brand: str, price: int, quantity: int):
-        """商品を新規追加するメソッド"""
-        
-        if target_brand in self.catalog:
-            raise DuplicateProductError(f"{target_brand}は販売中の商品です。")
-        
-        self.catalog.update({target_brand: Drink(target_brand, price)})
-        self.inventory.update({target_brand: quantity})
+    # def register_brand(self, target_brand: str, price: int, quantity: int):
+    #     """商品を新規追加するメソッド"""
+    #     
+    #     if target_brand in self.catalog:
+    #         raise DuplicateProductError(f"{target_brand}は販売中の商品です。")
+    #     
+    #     self.catalog.update({target_brand: Drink(target_brand, price)})
+    #     self.inventory.update({target_brand: quantity})
 
     def add_stock(self, target_brand_num: int, quantity: int):
         """商品在庫を追加するメソッド"""
