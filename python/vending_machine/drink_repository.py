@@ -26,6 +26,11 @@ class DrinkRepository:
         """取扱商品一覧を取得するメソッド"""
         return self.inventory.copy()
     
+    def get_price(self, product_id: int) -> int:
+        """商品価格を取得するメソッド"""
+        return self.inventory[product_id][1]
+    
+    
     def increase_stock(self, product_id: int, quantity: int) -> None:
         """指定された商品の在庫を quantity 本追加する"""
         
