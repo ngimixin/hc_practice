@@ -8,9 +8,9 @@ class InvalidChargeAmountError(ValueError):
     
     def __str__(self):
         return f"{self.args[0]}（入金額: {self.amount}円 / 残高: {self.balance}円）"
+    
 class InsufficientBalanceError(ValueError):
     """Suicaの残高不足を表す例外"""
-
     def __init__(self, shortage: int, balance: int, message: str):
         self.shortage = shortage
         self.balance = balance
@@ -18,6 +18,7 @@ class InsufficientBalanceError(ValueError):
 
     def __str__(self):
         return f"{self.args[0]}（不足額: {self.shortage}円 / 残高: {self.balance}円）"
+    
 class Suica:
     """Suica（実物準拠の仕様）
 
