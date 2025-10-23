@@ -1,4 +1,4 @@
-"""バリデーションモジュール"""
+"""入力値を検証するバリデーターモジュール"""
 
 from collections.abc import Callable
 from utils import console_style as cs
@@ -7,20 +7,19 @@ class CancelledInput(Exception):
     """ユーザーが入力をキャンセルしたことを表す例外"""
 
 PROMPT_DEFAULT = "> "
-INVALID_INPUT_MESSAGE = "\n無効な入力です。"
+INVALID_INPUT_MESSAGE = "無効な入力です。"
 CANCEL_TOKENS = {"", "q"} 
 
-def _check_cancel(user_input: str, allow_cancel: bool) -> None:
+def _check_cancel(user_input: str) -> None:
     """キャンセル入力を検知し、該当すれば CancelledInput を送出する。
     
     Args:
         user_input: 入力された文字列。
-        allow_cancel: キャンセルを許可するか。
     
     Raises:
         CancelledInput: キャンセル入力が検出された場合。
     """
-    if allow_cancel and user_input.strip() in CANCEL_TOKENS:
+    if user_input.strip() in CANCEL_TOKENS:
         raise CancelledInput()
 
 
@@ -40,11 +39,13 @@ def get_valid_int(condition: Callable[[int], bool], allow_cancel: bool = True) -
     while True:
         user_input = input(PROMPT_DEFAULT)        
         
-        _check_cancel(user_input, allow_cancel)
+        if allow_cancel:
+            _check_cancel(user_input)
         
         try:
             number = int(user_input)
         except ValueError:
+            print()
             print(INVALID_INPUT_MESSAGE)
             cs.print_line()
             continue
@@ -52,6 +53,7 @@ def get_valid_int(condition: Callable[[int], bool], allow_cancel: bool = True) -
         if condition(number):
             return number
 
+        print()
         print(INVALID_INPUT_MESSAGE)
         cs.print_line()
         
@@ -61,11 +63,13 @@ def get_valid_yes_no(condition: Callable[[str], bool], allow_cancel: bool = Fals
         user_input = input(PROMPT_DEFAULT)
         s = user_input.strip()
 
-        _check_cancel(user_input, allow_cancel)
+        if allow_cancel:
+            _check_cancel(user_input)
 
         # 空文字は 'n' 扱い
         if condition(s):
             return "n" if s == "" else s
 
+        print()
         print(f"{INVALID_INPUT_MESSAGE}もう一度入力してください。")
         cs.print_line()
