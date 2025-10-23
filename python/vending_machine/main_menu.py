@@ -3,8 +3,9 @@ from suica import Suica, InvalidChargeAmountError, InsufficientBalanceError
 from utils import console_style as cs
 from utils import input_validator as iv
 
+CANCEL_GUIDE_MESSAGE = "※ Enter（空入力）または q でキャンセル。"
+RETURN_PROMPT = "Enterで戻る > "
 MSG_CANCELLED_TO_MENU = "キャンセルしました。メインメニューに戻ります。"
-CANCEL_GUIDE_MESSAGE = "※ Enter（空入力）または q でキャンセルしてメインメニューに戻れます。"
 
 class MainMenu:
     def __init__(self, vm: VendingMachine, suica: Suica):
@@ -28,9 +29,14 @@ class MainMenu:
             print("0：終了")
             print()
             print("使用したい機能の番号を入力してください。")
-            choice = iv.get_valid_int(lambda x: 0 <= x <= 7, False)
+
+            try:
+                choice = iv.get_valid_int(lambda x: 0 <= x <= 7)
+            except iv.CancelledInput:
+                cs.print_line()
+                continue
+
             print()
-            
             actions = {
                 1: self._show_suica_balance,
                 2: self._charge_suica,
@@ -49,7 +55,9 @@ class MainMenu:
             print()
 
     def _show_suica_balance(self):
-        print(self.__suica.balance)
+        print(f"現在のSuica残高：{self.__suica.balance}円")
+        print()
+        input(RETURN_PROMPT)
         cs.print_line()
         
     def _charge_suica(self):
@@ -60,15 +68,18 @@ class MainMenu:
         try:
             amount = iv.get_valid_int(lambda x: x > 0)
         except iv.CancelledInput:
+            print()
             print(MSG_CANCELLED_TO_MENU)
             cs.print_line()
             return
             
         try:
             self.__suica.charge(amount)
+            print()
             print(f"{amount}円をチャージしました。")
         except InvalidChargeAmountError as e:
             print(e)
+            print()
+            input(RETURN_PROMPT)
             
-        print(f"現在のSuica残高：{self.__suica.balance}")
-        cs.print_line()
+        self._show_suica_balance()
