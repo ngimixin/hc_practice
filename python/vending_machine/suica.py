@@ -11,13 +11,14 @@ class InvalidChargeAmountError(ValueError):
     
 class InsufficientBalanceError(ValueError):
     """Suicaの残高不足を表す例外"""
-    def __init__(self, shortage: int, balance: int, message: str):
+    def __init__(self, price, shortage: int, balance: int, message: str):
+        self.price = price
         self.shortage = shortage
         self.balance = balance
         super().__init__(message)
 
     def __str__(self):
-        return f"{self.args[0]}（不足額: {self.shortage}円 / 残高: {self.balance}円）"
+        return f"{self.args[0]}（商品価格: {self.price} / 不足額: {self.shortage}円 / 残高: {self.balance}円）"
     
 class Suica:
     """Suica（実物準拠の仕様）
@@ -55,20 +56,20 @@ class Suica:
         # チャージ処理
         if amount >= 0:
             if amount < Suica.MIN_CHARGE:
-                raise InvalidChargeAmountError(amount, self.balance, f"{Suica.MIN_CHARGE}円以上の額をチャージして下さい。")
+                raise InvalidChargeAmountError(amount, self.balance, f"■{Suica.MIN_CHARGE}円以上の額をチャージして下さい。")
             new_balance = self.balance + amount
             if new_balance > Suica.MAX_BALANCE:
-                raise InvalidChargeAmountError(amount, self.balance, f"チャージ上限額（{Suica.MAX_BALANCE}円）を超えています。")
+                raise InvalidChargeAmountError(amount, self.balance, f"■チャージ上限額（{Suica.MAX_BALANCE}円）を超えています。")
             self.__balance = new_balance
         # 支払い処理
         else:
             # 支払い金額を正の数で取得
-            payment = -amount
-            if payment > self.balance:
+            price = -amount
+            if price > self.balance:
                 # 不足額を計算
-                shortage = payment - self.balance
+                shortage = price - self.balance
                 # 残高が支払い金額より少ない場合はエラー
-                raise InsufficientBalanceError(shortage, self.balance, f"残高不足です。（支払い金額: {payment}）")
+                raise InsufficientBalanceError(price, shortage, self.balance, f"■残高不足です。")
             self.__balance = self.__balance + amount
 
 
