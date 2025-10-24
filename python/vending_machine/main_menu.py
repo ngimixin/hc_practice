@@ -1,4 +1,5 @@
 from vending_machine import VendingMachine
+from drink_repository import SoldOutError, ProductNotFoundError
 from suica import Suica, InvalidChargeAmountError, InsufficientBalanceError
 from utils import console_style as cs
 from utils import input_validator as iv
@@ -12,6 +13,7 @@ class MainMenu:
         self.__is_running = True
         self.__vm = vm 
         self.__suica = suica
+        self.__purchased_drinks = None
         
     def display(self):
         
@@ -20,11 +22,11 @@ class MainMenu:
             print()
             print("1：Suicaの残高を確認する")
             print("2：Suicaにチャージする")
-            print("3：購入可能なドリンクを表示する")
-            print("4：全てのドリンクを表示する")
+            print("3：全てのドリンクを表示する")
+            print("4：購入可能なドリンクを表示する")
             print("5：ドリンクを購入する")
             print("6：ドリンクの在庫を補充する")
-            print("7：売上金額を確認する")
+            print("7：自販機の売上金額を確認する")
             print("8：購入したドリンク一覧を確認する")
             print("0：終了")
             print()
@@ -40,10 +42,10 @@ class MainMenu:
             actions = {
                 1: self._show_suica_balance,
                 2: self._charge_suica,
-                # 3: self._show_parchasable_drinks,
-                # 4: self._show_all_drinks,
-                # 5: self._purchase_drink,
-                # 6: self._restock_drink,
+                3: self._show_all_drinks,
+                4: self._show_parchasable_drinks,
+                5: self._purchase_drink,
+                6: self._restock_drink,
                 # 7: self._show_sales,
                 # 8: self._show_purchased_drinks
                 # 0: self._exit_progam,
@@ -51,15 +53,23 @@ class MainMenu:
             
             action = actions.get(choice)
             if action:
-                action()
+                # 呼び出した関数で入力をキャンセルした時用フラグ
+                is_cancelled = action()
+                if is_cancelled:
+                    print()
+                    print(MSG_CANCELLED_TO_MENU)
+                    cs.print_line()
+                    print()
+                    continue
+
+            print()
+            input(RETURN_PROMPT)
+            cs.print_line()
             print()
 
     def _show_suica_balance(self):
-        print(f"現在のSuica残高：{self.__suica.balance}円")
-        print()
-        input(RETURN_PROMPT)
-        cs.print_line()
-        
+        print(f"■現在のSuica残高：{self.__suica.balance}円")
+    
     def _charge_suica(self):
         print("チャージ金額を数字で入力してください。")
         print(f"※ {Suica.MIN_CHARGE}円〜{Suica.MAX_BALANCE - self.__suica.balance}円までチャージ可能です。")
@@ -68,18 +78,96 @@ class MainMenu:
         try:
             amount = iv.get_valid_int(lambda x: x > 0)
         except iv.CancelledInput:
-            print()
-            print(MSG_CANCELLED_TO_MENU)
-            cs.print_line()
-            return
+            return True
             
         try:
             self.__suica.charge(amount)
             print()
-            print(f"{amount}円をチャージしました。")
+            print(f"■{amount}円をチャージしました。")
         except InvalidChargeAmountError as e:
-            print(e)
             print()
-            input(RETURN_PROMPT)
+            print(e)
+            return
             
         self._show_suica_balance()
+
+    def _show_all_drinks(self):
+        inventory = self.__vm.get_brands()
+        print("■商品一覧")
+
+        for product_id, drink_info in inventory.items():
+            brand, price, stock = drink_info
+            print(f"[{product_id}] {brand}：{price}円 / 在庫数：{len(stock)}本")
+            
+
+    def _show_parchasable_drinks(self):
+        available_brands = self.__vm.get_available_brands(self.__suica)
+        
+        if not available_brands:
+            print("■現在購入可能な商品はありません。")
+        else:
+            print("■購入可能商品一覧")
+            
+            for product_id, drink_info in available_brands.items():
+                brand, price, stock = drink_info
+                print(f"[{product_id}] {brand}：{price}円 / 在庫数：{len(stock)}本")
+
+        
+    def _purchase_drink(self):
+        # self.__vm.get_brands()
+        self._show_all_drinks()
+        print()
+
+        print("購入したい商品の番号を入力してください。")
+        print(CANCEL_GUIDE_MESSAGE)
+
+        try:
+            product_id = iv.get_valid_int(lambda x: x > 0)
+        except iv.CancelledInput:
+            return True
+
+        try: 
+            drink = self.__vm.vend(product_id, self.__suica)
+        except InsufficientBalanceError as e:
+            print()
+            print(e)
+            return
+        except SoldOutError as e:
+            print()
+            print(e)
+            return
+        else:
+            print()
+            print(f"■{drink.brand}を購入しました。")
+            self._show_suica_balance()
+
+    def _restock_drink(self):
+
+        try:
+            print("補充したい商品の番号を入力してください。")
+            print(CANCEL_GUIDE_MESSAGE)
+            print()
+            self._show_all_drinks()
+            product_id = iv.get_valid_int(lambda x: x > 0)
+            print()
+            print("補充する数を入力してください。")
+            print(CANCEL_GUIDE_MESSAGE)
+            quantity = iv.get_valid_int(lambda x: x > 0)
+        except iv.CancelledInput:
+            return True
+
+        try:
+            self.__vm.restock(product_id, quantity)
+        except ProductNotFoundError as e:
+            print()
+            print(e)
+            return
+        else:
+            inventory = self.__vm.get_brands()
+            brand = inventory[product_id][0]
+            print()
+            print(f"■{brand}を{quantity}本補充しました。")
+            return
+            
+        
+        
