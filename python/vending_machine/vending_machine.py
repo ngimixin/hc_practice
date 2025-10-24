@@ -1,10 +1,10 @@
 from __future__ import annotations
-from drink_repository import DrinkRepository
+from drink_repository import DrinkRepository, SoldOutError
 from drink import Drink
 from suica import Suica
 
-class SoldOutError(Exception):
-    """在庫切れのときに発生する例外"""
+# class SoldOutError(Exception):
+#     """在庫切れのときに発生する例外"""
 
 class VendingMachine:
     def __init__(self, repo: DrinkRepository, initial_amount=0):
@@ -22,24 +22,30 @@ class VendingMachine:
     def get_brands(self):
         """全ドリンク一覧を返す"""
         inventory = self.__repo.get_all()
-        brands = []
+        # brands = []
 
-        for brand, price, stock in inventory.values():
-            brands.append((brand, price, stock))
+        # for brand, price, stock in inventory.values():
+        #     brands.append((brand, price, stock))
                 
-        return brands
+        # return brands
+        return inventory
 
-    def get_available_brands(self):
+    def get_available_brands(self, suica: Suica):
         """購入可能なドリンク一覧を返す（現在の残高で購入可能かつ在庫が1本以上あるドリンク）"""
-        brands = self.get_brands()
-        available_brands = []
-        
-        for brand, price, stock in brands:
-            if stock and self.total_amount >= price:
-                available_brands.append((brand, price))
-        
+        inventory = self.get_brands()
+    #     brands = self.get_brands()
+        available_brands = {}
+    #     
+    #     for brand, price, stock in brands:
+    #         if stock and suica.balance >= price:
+    #             available_brands.append((brand, price, stock))
+        for product_id, drink_info in inventory.items():
+            _, price, stock = drink_info
+            if stock and suica.balance >= price:
+                available_brands[product_id] = drink_info
+    #     
+        # print("[DEBUG]", "test")
         return available_brands
-    
 
     def restock(self, product_id: int, quantity: int) -> None:
         """商品在庫を追加するメソッド"""
