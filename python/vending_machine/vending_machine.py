@@ -3,9 +3,6 @@ from drink_repository import DrinkRepository, SoldOutError
 from drink import Drink
 from suica import Suica
 
-# class SoldOutError(Exception):
-#     """在庫切れのときに発生する例外"""
-
 class VendingMachine:
     def __init__(self, repo: DrinkRepository, initial_amount=0):
         self.__total_amount = initial_amount
@@ -22,36 +19,25 @@ class VendingMachine:
     def get_brands(self):
         """全ドリンク一覧を返す"""
         inventory = self.__repo.get_all()
-        # brands = []
-
-        # for brand, price, stock in inventory.values():
-        #     brands.append((brand, price, stock))
-                
-        # return brands
         return inventory
 
     def get_available_brands(self, suica: Suica):
         """購入可能なドリンク一覧を返す（現在の残高で購入可能かつ在庫が1本以上あるドリンク）"""
         inventory = self.get_brands()
-    #     brands = self.get_brands()
         available_brands = {}
-    #     
-    #     for brand, price, stock in brands:
-    #         if stock and suica.balance >= price:
-    #             available_brands.append((brand, price, stock))
+
         for product_id, drink_info in inventory.items():
             _, price, stock = drink_info
             if stock and suica.balance >= price:
                 available_brands[product_id] = drink_info
-    #     
-        # print("[DEBUG]", "test")
+
         return available_brands
 
     def restock(self, product_id: int, quantity: int) -> None:
         """商品在庫を追加するメソッド"""
         self.__repo.increase_stock(product_id, quantity)
 
-    def vend(self, product_id: int, suica: Suica) -> Drink:
+    def vend(self, product_id: int, suica: Suica) -> tuple[int, Drink]:
         """商品を一本購入するメソッド"""
         price = self.__repo.get_price(product_id)
 
@@ -64,8 +50,9 @@ class VendingMachine:
             # 返金処理（内部的にはチャージと同義）
             suica.charge(price) 
             raise e
-
-        return drink
+        
+        self.total_amount += price
+        return (product_id, drink)
 
 #
 # if __name__ == "__main__":
