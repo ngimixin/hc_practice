@@ -7,8 +7,8 @@ class CancelledInput(Exception):
     """ユーザーが入力をキャンセルしたことを表す例外"""
 
 PROMPT_DEFAULT = "> "
-INVALID_INPUT_MESSAGE = "無効な入力です。"
-CANCEL_TOKENS = {"", "q"} 
+INVALID_INPUT_MESSAGE = "無効な入力です。もう一度入力してください。"
+CANCEL_TOKENS = {"", "q", "n", "N"} 
 
 def _check_cancel(user_input: str) -> None:
     """キャンセル入力を検知し、該当すれば CancelledInput を送出する。
@@ -57,19 +57,19 @@ def get_valid_int(condition: Callable[[int], bool], allow_cancel: bool = True) -
         print(INVALID_INPUT_MESSAGE)
         cs.print_line()
         
-def get_valid_yes_no(condition: Callable[[str], bool], allow_cancel: bool = False) -> str:
+def get_valid_yes_no(condition: Callable[[str], bool], allow_cancel: bool = True) -> str:
     """y/n入力を受け、条件を満たすまで繰り返す。返り値は 'y' または 'n' 相当の1文字を返す想定。"""
     while True:
         user_input = input(PROMPT_DEFAULT)
-        s = user_input.strip()
+        cleaned_input = user_input.strip()
 
         if allow_cancel:
-            _check_cancel(user_input)
+            _check_cancel(cleaned_input)
 
-        # 空文字は 'n' 扱い
-        if condition(s):
-            return "n" if s == "" else s
+        if condition(cleaned_input):
+            # return "n" if cleaned_input == "" else cleaned_input
+            return cleaned_input
 
         print()
-        print(f"{INVALID_INPUT_MESSAGE}もう一度入力してください。")
+        print(INVALID_INPUT_MESSAGE)
         cs.print_line()
