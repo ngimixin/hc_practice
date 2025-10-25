@@ -8,7 +8,7 @@ class ProductNotFoundError(KeyError):
     """指定された商品IDが存在しない場合に発生する例外"""
     def __init__(self, product_id: int):
         self.product_id = product_id
-        super().__init__(f"■商品ID：{product_id}は存在しません。")
+        super().__init__(f"■商品ID：{product_id} は存在しません。")
 
     def __str__(self) -> str:
         return self.args[0]
@@ -23,6 +23,10 @@ class DrinkRepository:
     
     def get_price(self, product_id: int) -> int:
         """商品価格を取得するメソッド"""
+        # 存在しない product_id を指定したらエラー
+        if product_id not in self.__inventory:
+            raise ProductNotFoundError(product_id)
+
         return self.__inventory[product_id][1]
     
     def increase_stock(self, product_id: int, quantity: int) -> None:
