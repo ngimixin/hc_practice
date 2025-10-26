@@ -66,22 +66,6 @@ class DrinkRepository:
 
         return self.__inventory[product_id][1]
 
-    def increase_stock(self, product_id: int, quantity: int) -> None:
-        """指定商品の在庫を quantity 本追加する。
-
-        Args:
-            product_id: 対象商品のID。
-            quantity: 追加本数（1以上を想定）。
-
-        Raises:
-            ProductNotFoundError: 指定IDの商品が存在しない場合。
-        """
-        if product_id not in self.__inventory:
-            raise ProductNotFoundError(product_id)
-
-        brand, price, drinks = self.__inventory[product_id]
-        drinks.extend(Drink(brand, price) for _ in range(quantity))
-
     def decrease_stock(self, product_id: int) -> Drink:
         """指定商品の在庫を1本減らし、そのドリンクを返す。
 
@@ -103,3 +87,19 @@ class DrinkRepository:
             raise SoldOutError(f"■{brand}は売り切れです。")
 
         return drinks.popleft()
+
+    def increase_stock(self, product_id: int, quantity: int) -> None:
+        """指定商品の在庫を quantity 本追加する。
+
+        Args:
+            product_id: 対象商品のID。
+            quantity: 追加本数（1以上を想定）。
+
+        Raises:
+            ProductNotFoundError: 指定IDの商品が存在しない場合。
+        """
+        if product_id not in self.__inventory:
+            raise ProductNotFoundError(product_id)
+
+        brand, price, drinks = self.__inventory[product_id]
+        drinks.extend(Drink(brand, price) for _ in range(quantity))
