@@ -35,38 +35,40 @@ class MainMenu:
         self.__purchased_drinks: list[tuple[int, Drink]] = []
 
     def display(self) -> None:
-        """メインメニューを表示し、ループで入力を受け付ける。"""
+        """メインメニューを表示し、ループで入力を受け付ける。
+
+        各ループの先頭で現在のSuica残高を表示する。
+        """
         while self.__is_running:
             print(f"【{APP_NAME} メニュー】")
+            self._show_suica_balance()
             print()
-            print("1：Suicaの残高を確認する")
-            print("2：Suicaにチャージする")
-            print("3：全てのドリンクを表示する")
-            print("4：購入可能なドリンクを表示する")
-            print("5：ドリンクを購入する")
-            print("6：ドリンクの在庫を補充する")
-            print("7：自販機の売上金額を確認する")
-            print("8：購入したドリンク一覧を確認する")
+            print("1：Suicaにチャージする")
+            print("2：全ドリンク一覧を表示する")
+            print("3：購入可能なドリンクを表示する")
+            print("4：ドリンクを購入する")
+            print("5：ドリンクの在庫を補充する")
+            print("6：自販機の売上金額を確認する")
+            print("7：購入したドリンク一覧を確認する")
             print("0：終了")
             print()
             print("使用したい機能の番号を入力してください。")
 
             try:
-                choice = iv.get_valid_int(lambda x: 0 <= x <= 8)
+                choice = iv.get_valid_int(lambda x: 0 <= x <= 7)
             except iv.CancelledInput:
                 cs.print_line()
                 continue
 
             print()
             actions = {
-                1: self._show_suica_balance,
-                2: self._charge_suica,
-                3: self._show_all_drinks,
-                4: self._show_parchasable_drinks,
-                5: self._purchase_drink,
-                6: self._restock_drink,
-                7: self._show_sales,
-                8: self._show_purchased_drinks,
+                1: self._charge_suica,
+                2: self._show_all_drinks,
+                3: self._show_parchasable_drinks,
+                4: self._purchase_drink,
+                5: self._restock_drink,
+                6: self._show_sales,
+                7: self._show_purchased_drinks,
                 0: self._exit_progam,
             }
 
@@ -86,6 +88,7 @@ class MainMenu:
             print()
 
     def _show_suica_balance(self) -> None:
+        """現在のSuica残高を表示する。"""
         print(f"■現在のSuica残高：{self.__suica.balance}円")
 
     def _charge_suica(self) -> bool | None:
@@ -119,6 +122,10 @@ class MainMenu:
         self._show_suica_balance()
 
     def _show_all_drinks(self) -> None:
+        """自販機で取り扱っている全ドリンクを一覧表示する。
+
+        在庫数が0本の商品や、Suica残高では購入できない商品も含めて表示する。
+        """
         inventory = self.__vm.get_brands()
         print("■商品一覧")
 
@@ -127,6 +134,10 @@ class MainMenu:
             print(f"[{product_id}] {brand}：{price}円 / 在庫数：{len(stock)}本")
 
     def _show_parchasable_drinks(self) -> None:
+        """現在のSuica残高で購入可能なドリンクのみを一覧表示する。
+
+        在庫が1本以上あり、かつSuica残高が価格以上の商品を抽出して表示する。
+        """
         available_brands = self.__vm.get_available_brands(self.__suica)
 
         if not available_brands:
@@ -209,6 +220,7 @@ class MainMenu:
             print(f"■{brand}を{quantity}本補充しました。")
 
     def _show_sales(self) -> None:
+        """自販機の売上金額を表示する。"""
         print(f"■自販機の売上金額：{self.__vm.total_amount}円")
 
     def _show_purchased_drinks(self) -> None:
