@@ -85,12 +85,13 @@ class Player(NameService):
 if __name__ == "__main__":
     pika = Pikachu("でんき", "", 100)
     player = Player()
-
-    pika.change_name("太郎")
-    print(pika.get_name())  # 太郎
+    
+    pika.change_name("ピカチュウ")
+    print(pika.get_name())  # ピカチュウ
+    pika.attack()
 
     pika.change_name("うんこ")  # 不適切な名前です と表示される
     print(pika.get_name())  # 太郎
 
     player.change_name("サトシ")
-    print(player.get_name())  # サトシ
+    print(player.get_name())  # ピカチュウ
