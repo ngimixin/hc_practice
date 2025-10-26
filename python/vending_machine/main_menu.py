@@ -1,27 +1,41 @@
+import sys
+from collections import Counter
+
 from vending_machine import VendingMachine
 from drink_repository import SoldOutError, ProductNotFoundError
 from suica import Suica, InvalidChargeAmountError, InsufficientBalanceError
 from drink import Drink
 from utils import console_style as cs
 from utils import input_validator as iv
-from collections import Counter
-import sys
 
 
-APP_NAME = "自販機シミュレーター"
-CANCEL_GUIDE_MESSAGE = "※ Enter（空入力）または q でキャンセル。"
-RETURN_PROMPT = "Enterで戻る > "
-MSG_CANCELLED_TO_MENU = "キャンセルしました。"
+APP_NAME: str = "自販機シミュレーター"
+CANCEL_GUIDE_MESSAGE: str = "※ Enter（空入力）または q でキャンセル。"
+RETURN_PROMPT: str = "Enterで戻る > "
+MSG_CANCELLED_TO_MENU: str = "キャンセルしました。"
+
 
 class MainMenu:
-    def __init__(self, vm: VendingMachine, suica: Suica):
+    """コンソールUIのメインメニュー。
+
+    自販機本体（VendingMachine）とSuicaを受け取り、
+    ユーザー操作の入口となるクラス。
+    """
+
+    def __init__(self, vm: VendingMachine, suica: Suica) -> None:
+        """依存を受け取って初期化する。
+
+        Args:
+            vm: 自販機本体（在庫管理・販売を担当）。
+            suica: ユーザーのSuica（残高管理を担当）。
+        """
         self.__is_running = True
-        self.__vm = vm 
+        self.__vm = vm
         self.__suica = suica
         self.__purchased_drinks: list[tuple[int, Drink]] = []
-        
-    def display(self):
-        
+
+    def display(self) -> None:
+        """メインメニューを表示し、ループで入力を受け付ける。"""
         while self.__is_running:
             print(f"【{APP_NAME} メニュー】")
             print()
@@ -55,7 +69,7 @@ class MainMenu:
                 8: self._show_purchased_drinks,
                 0: self._exit_progam,
             }
-            
+
             action = actions.get(choice)
             if action:
                 # 入力キャンセル時用フラグ
@@ -71,19 +85,28 @@ class MainMenu:
             cs.print_line()
             print()
 
-    def _show_suica_balance(self):
+    def _show_suica_balance(self) -> None:
         print(f"■現在のSuica残高：{self.__suica.balance}円")
-    
-    def _charge_suica(self):
+
+    def _charge_suica(self) -> bool | None:
+        """Suicaに金額をチャージする。
+
+        Returns:
+            True: 入力がキャンセルされた場合。
+            None: 正常終了またはエラー表示時。
+        """
         print("チャージ金額を数字で入力してください。")
-        print(f"※ {Suica.MIN_CHARGE}円〜{Suica.MAX_BALANCE - self.__suica.balance}円までチャージ可能です。")
+        print(
+            f"※ {Suica.MIN_CHARGE}円〜"
+            f"{Suica.MAX_BALANCE - self.__suica.balance}円までチャージ可能です。"
+        )
         print(CANCEL_GUIDE_MESSAGE)
-        
+
         try:
             amount = iv.get_valid_int(lambda x: x > 0)
         except iv.CancelledInput:
             return True
-            
+
         try:
             self.__suica.charge(amount)
             print()
@@ -92,32 +115,36 @@ class MainMenu:
             print()
             print(e)
             return
-            
+
         self._show_suica_balance()
 
-    def _show_all_drinks(self):
+    def _show_all_drinks(self) -> None:
         inventory = self.__vm.get_brands()
         print("■商品一覧")
 
         for product_id, drink_info in inventory.items():
             brand, price, stock = drink_info
             print(f"[{product_id}] {brand}：{price}円 / 在庫数：{len(stock)}本")
-            
 
-    def _show_parchasable_drinks(self):
+    def _show_parchasable_drinks(self) -> None:
         available_brands = self.__vm.get_available_brands(self.__suica)
-        
+
         if not available_brands:
             print("■現在購入可能な商品はありません。")
         else:
             print("■購入可能商品一覧")
-            
+
             for product_id, drink_info in available_brands.items():
                 brand, price, stock = drink_info
                 print(f"[{product_id}] {brand}：{price}円 / 在庫数：{len(stock)}本")
 
-        
-    def _purchase_drink(self):
+    def _purchase_drink(self) -> bool | None:
+        """ドリンク購入処理を実行する。
+
+        Returns:
+            True: 入力がキャンセルされた場合。
+            None: 正常終了またはエラー表示時。
+        """
         self._show_all_drinks()
         print()
 
@@ -129,7 +156,7 @@ class MainMenu:
         except iv.CancelledInput:
             return True
 
-        try: 
+        try:
             product_id, drink = self.__vm.vend(product_id, self.__suica)
         except ProductNotFoundError as e:
             print()
@@ -149,8 +176,13 @@ class MainMenu:
             self.__purchased_drinks.append((product_id, drink))
             self._show_suica_balance()
 
-    def _restock_drink(self):
+    def _restock_drink(self) -> bool | None:
+        """指定された商品を補充する。
 
+        Returns:
+            True: 入力がキャンセルされた場合。
+            None: 正常終了またはエラー表示時。
+        """
         try:
             print("補充したい商品の番号を入力してください。")
             print(CANCEL_GUIDE_MESSAGE)
@@ -175,38 +207,37 @@ class MainMenu:
             brand = inventory[product_id][0]
             print()
             print(f"■{brand}を{quantity}本補充しました。")
-            return
-            
-    def _show_sales(self):
+
+    def _show_sales(self) -> None:
         print(f"■自販機の売上金額：{self.__vm.total_amount}円")
-        
-    def _show_purchased_drinks(self):
-        """購入履歴を product_id ごとにまとめて表示する"""
+
+    def _show_purchased_drinks(self) -> None:
+        """購入履歴を product_id ごとに集計して表示する。"""
         if not self.__purchased_drinks:
             print("■購入履歴はありません。")
             return
 
-        print(f"■購入ドリンク一覧（商品ID順）")
+        print("■購入ドリンク一覧（商品ID順）")
         id_counts = Counter(pid for pid, _ in self.__purchased_drinks)
         for product_id in sorted(id_counts):
             drink = next(d for pid, d in self.__purchased_drinks if pid == product_id)
             count = id_counts[product_id]
             print(f"{product_id}：{drink.brand}（{count}本）")
-            
-    def _exit_progam(self):
-        """アプリケーションを終了する"""
+
+    def _exit_progam(self) -> bool | None:
+        """アプリケーションを終了する（確認付き）。
+
+        Returns:
+            True: 入力がキャンセルされた場合（終了せずメニューに戻る）。
+            None: 終了が確定した場合（システム終了）。
+        """
         print(f"{APP_NAME}を終了します。")
         print("よろしいでしょうか？ はい（y）/ いいえ（n）")
         try:
-            yes = iv.get_valid_yes_no(
-                lambda s: len(s) == 1 and s.lower() == "y"
-            )
+            iv.get_valid_yes_no(lambda s: len(s) == 1 and s.lower() == "y")
         except iv.CancelledInput:
             return True
-        
+
         print()
         print("ご利用ありがとうございました。")
         sys.exit()
-            
-
-    #TODO: docstring、型ヒントなど追加。モジュールのディレクトリ仕分けすべきか。
