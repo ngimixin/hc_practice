@@ -57,18 +57,6 @@ class VendingMachine:
 
         return available_brands
 
-    def restock(self, product_id: int, quantity: int) -> None:
-        """指定商品の在庫を追加する。
-
-        Args:
-            product_id: 在庫を追加する商品の ID。
-            quantity: 追加本数（1 以上）。
-
-        Raises:
-            ProductNotFoundError: product_id が存在しない場合（リポジトリ実装に依存）。
-        """
-        self.__repo.increase_stock(product_id, quantity)
-
     def vend(self, product_id: int, suica: Suica) -> tuple[int, Drink]:
         """指定商品を 1 本販売する。
 
@@ -100,3 +88,15 @@ class VendingMachine:
 
         self.total_amount += price
         return (product_id, drink)
+
+    def restock(self, product_id: int, quantity: int) -> None:
+        """指定商品の在庫を追加する。
+
+        Args:
+            product_id: 在庫を追加する商品の ID。
+            quantity: 追加本数（1 以上）。
+
+        Raises:
+            ProductNotFoundError: product_id が存在しない場合（リポジトリ実装に依存）。
+        """
+        self.__repo.increase_stock(product_id, quantity)
