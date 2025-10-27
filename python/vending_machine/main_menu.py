@@ -64,12 +64,12 @@ class MainMenu:
             actions = {
                 1: self._charge_suica,
                 2: self._show_all_drinks,
-                3: self._show_parchasable_drinks,
+                3: self._show_purchasable_drinks,
                 4: self._purchase_drink,
                 5: self._restock_drink,
                 6: self._show_sales,
                 7: self._show_purchased_drinks,
-                0: self._exit_progam,
+                0: self._exit_program,
             }
 
             action = actions.get(choice)
@@ -133,7 +133,7 @@ class MainMenu:
             brand, price, stock = drink_info
             print(f"[{product_id}] {brand}：{price}円 / 在庫数：{len(stock)}本")
 
-    def _show_parchasable_drinks(self) -> None:
+    def _show_purchasable_drinks(self) -> None:
         """現在のSuica残高で購入可能なドリンクのみを一覧表示する。
 
         在庫が1本以上あり、かつSuica残高が価格以上の商品を抽出して表示する。
@@ -236,7 +236,7 @@ class MainMenu:
             count = id_counts[product_id]
             print(f"{product_id}：{drink.brand}（{count}本）")
 
-    def _exit_progam(self) -> bool | None:
+    def _exit_program(self) -> bool | None:
         """アプリケーションを終了する（確認付き）。
 
         Returns:
