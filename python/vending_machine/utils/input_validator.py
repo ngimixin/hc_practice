@@ -8,8 +8,8 @@ class CancelledInput(Exception):
     """ユーザーが入力をキャンセルしたことを表す例外。"""
 
 
-PROMPT_DEFAULT: str = "> "
-INVALID_INPUT_MESSAGE: str = "無効な入力です。もう一度入力してください。"
+PROMPT_DEFAULT = "> "
+INVALID_INPUT_MESSAGE = "無効な入力です。もう一度入力してください。"
 CANCEL_TOKENS: set[str] = {"", "q", "n", "N"}
 
 

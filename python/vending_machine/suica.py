@@ -31,8 +31,8 @@ class Suica:
         MAX_BALANCE (int): Suicaの残高上限額。
     """
 
-    MIN_CHARGE: int = 100
-    MAX_BALANCE: int = 20000
+    MIN_CHARGE = 100
+    MAX_BALANCE = 20000
 
     def __init__(self, balance: int = 0) -> None:
         """Suicaを初期化する。
