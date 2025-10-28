@@ -9,10 +9,10 @@ from utils import console_style as cs
 from utils import input_validator as iv
 
 
-APP_NAME: str = "自販機シミュレーター"
-CANCEL_GUIDE_MESSAGE: str = "※ Enter（空入力）または q でキャンセル。"
-RETURN_PROMPT: str = "Enterで戻る > "
-MSG_CANCELLED_TO_MENU: str = "キャンセルしました。"
+APP_NAME = "自販機シミュレーター"
+CANCEL_GUIDE_MESSAGE = "※ Enter（空入力）または q でキャンセル。"
+RETURN_PROMPT = "Enterで戻る > "
+MSG_CANCELLED_TO_MENU = "キャンセルしました。"
 
 
 class MainMenu:
