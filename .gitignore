@@ -2,3 +2,6 @@
 
 # ローカルテスト用ファイルは無視
 python/test.py
+
+# 整形用スクリプト（Git除外）
+**/align_brace.py
