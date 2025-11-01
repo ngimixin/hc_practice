@@ -37,6 +37,14 @@
   updated_at           {label: "datetime, not null"}
   # NOTE: UNIQUE(user_id, tweet_id)
 
+[bookmarks]
+  *id                  {label: "bigint, not null"}
+  user_id              {label: "bigint, not null, FK(users)"}
+  tweet_id             {label: "bigint, not null, FK(tweets)"}
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+  # NOTE: UNIQUE(user_id, tweet_id)
+
 [follows]
   *id                  {label: "bigint, not null"}
   follower_id          {label: "bigint, not null, FK(users)"}
@@ -45,14 +53,6 @@
   updated_at           {label: "datetime, not null"}
   # NOTE: UNIQUE(follower_id, followee_id)
   # NOTE: CHECK follower_id <> followee_id
-
-[bookmarks]
-  *id                  {label: "bigint, not null"}
-  user_id              {label: "bigint, not null, FK(users)"}
-  tweet_id             {label: "bigint, not null, FK(tweets)"}
-  created_at           {label: "datetime, not null"}
-  updated_at           {label: "datetime, not null"}
-  # NOTE: UNIQUE(user_id, tweet_id)
 
 [direct_messages]
   *id                  {label: "bigint, not null"}
@@ -67,8 +67,9 @@
   *id                  {label: "bigint, not null"}
   user_id              {label: "bigint, not null, FK(users)"}     # 受け手
   actor_user_id        {label: "bigint, not null, FK(users)"}     # 行為者
-  type                 {label: "varchar, not null"}               # 'like'|'follow'|'retweet'
+  type                 {label: "varchar, not null"}               # 'like'|'follow'|'retweet'|'direct_message'
   tweet_id             {label: "bigint, null, FK(tweets)"}
+  direct_message_id    {label: "bigint, null, FK(direct_messages)"}
   read_at              {label: "datetime, null"}
   created_at           {label: "datetime, not null"}
   updated_at           {label: "datetime, not null"}
@@ -93,6 +94,9 @@ tweets ?--* notifications    # ツイートに紐づかない通知もあるの�
 
 # 3) 自己参照（リプライ木）
 tweets ?--* tweets           # 親ツイートは0/1、子（リプライ）は0..*
+
+# 4) Direct_message起点
+direct_message ?--* notifications
 
 # Cardinality    Syntax
 # 0 or 1         ?

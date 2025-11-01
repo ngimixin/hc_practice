@@ -91,8 +91,9 @@ CREATE TABLE notifications (
   id             BIGSERIAL PRIMARY KEY,
   user_id        BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,   -- 受け手
   actor_user_id  BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,   -- 行為者
-  type           VARCHAR NOT NULL,                                         -- 'like'|'follow'|'retweet' など
+  type           VARCHAR NOT NULL,                                         -- 'like'|'follow'|'retweet'|'direct_message' など
   tweet_id       BIGINT NULL REFERENCES tweets(id) ON DELETE CASCADE,
+  direct_message_id BIGINT NULL REFERENCES direct_messages(id) ON DELETE CASCADE,
   read_at        TIMESTAMP NULL,
   created_at     TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at     TIMESTAMP NOT NULL DEFAULT NOW()
