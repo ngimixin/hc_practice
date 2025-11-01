@@ -96,7 +96,7 @@ tweets ?--* notifications    # ツイートに紐づかない通知もあるの�
 tweets ?--* tweets           # 親ツイートは0/1、子（リプライ）は0..*
 
 # 4) Direct_message起点
-direct_message ?--* notifications
+direct_message 1--1 notifications
 
 # Cardinality    Syntax
 # 0 or 1         ?
