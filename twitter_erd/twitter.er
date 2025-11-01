@@ -17,7 +17,7 @@
   *id                  {label: "bigint, not null"}
   user_id              {label: "bigint, not null, FK(users)"}
   body                 {label: "varchar(140), not null"}
-  in_reply_to_tweet_id {label: "bigint, null, FK(tweets)"}
+  in_reply_to_tweet_id {label: "bigint, null, FK(tweets)"} # 親ツイートを指す（返信先）
   created_at           {label: "datetime, not null"}
   updated_at           {label: "datetime, not null"}
 
