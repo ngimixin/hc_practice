@@ -1,0 +1,105 @@
+[users]
+  *id                  {label: "bigint, not null"}
+  email                {label: "varchar, not null, uniq"}
+  username             {label: "varchar, not null, uniq"}
+  phone_number         {label: "varchar, null, uniq"}
+  full_name            {label: "varchar, not null"}
+  bio                  {label: "text, null"}
+  location             {label: "varchar, null"}
+  website              {label: "varchar, null"}
+  birthdate            {label: "date, not null"}
+  profile_image_url    {label: "varchar, null"}
+  avatar_image_url     {label: "varchar, null"}
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+
+[tweets]
+  *id                  {label: "bigint, not null"}
+  user_id              {label: "bigint, not null, FK(users)"}
+  body                 {label: "varchar(140), not null"}
+  parent_tweet_id      {label: "bigint, null, FK(tweets)"} # 親ツイートを指す（返信先）
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+
+[likes]
+  *id                  {label: "bigint, not null"}
+  user_id              {label: "bigint, not null, FK(users)"}
+  tweet_id             {label: "bigint, not null, FK(tweets)"}
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+  # NOTE: UNIQUE(user_id, tweet_id)
+
+[retweets]
+  *id                  {label: "bigint, not null"}
+  user_id              {label: "bigint, not null, FK(users)"}
+  tweet_id             {label: "bigint, not null, FK(tweets)"}
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+  # NOTE: UNIQUE(user_id, tweet_id)
+
+[bookmarks]
+  *id                  {label: "bigint, not null"}
+  user_id              {label: "bigint, not null, FK(users)"}
+  tweet_id             {label: "bigint, not null, FK(tweets)"}
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+  # NOTE: UNIQUE(user_id, tweet_id)
+
+[follows]
+  *id                  {label: "bigint, not null"}
+  follower_id          {label: "bigint, not null, FK(users)"}
+  followee_id          {label: "bigint, not null, FK(users)"}
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+  # NOTE: UNIQUE(follower_id, followee_id)
+  # NOTE: CHECK follower_id <> followee_id
+
+[direct_messages]
+  *id                  {label: "bigint, not null"}
+  sender_id            {label: "bigint, not null, FK(users)"}
+  recipient_id         {label: "bigint, not null, FK(users)"}
+  body                 {label: "text, not null"}
+  read_at              {label: "datetime, null"}
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+
+[notifications]
+  *id                  {label: "bigint, not null"}
+  user_id              {label: "bigint, not null, FK(users)"}     # 受け手
+  actor_user_id        {label: "bigint, not null, FK(users)"}     # 行為者
+  type                 {label: "varchar, not null"}               # 'like'|'follow'|'retweet'|'direct_message'
+  tweet_id             {label: "bigint, null, FK(tweets)"}
+  direct_message_id    {label: "bigint, null, FK(direct_messages)"}
+  read_at              {label: "datetime, null"}
+  created_at           {label: "datetime, not null"}
+  updated_at           {label: "datetime, not null"}
+
+# 1) Users起点（ユーザーが“する”/“される”側の関係をまとめる）
+users 1--* tweets
+users 1--* likes            # via likes.user_id（いいねした人）
+users 1--* retweets         # via retweets.user_id（RTした人）
+users 1--* bookmarks        # via bookmarks.user_id（ブクマした人）
+users 1--* follows          # via follows.follower_id（フォローする側）
+users 1--* follows          # via follows.followee_id（フォローされる側）
+users 1--* direct_messages  # via direct_messages.sender_id（送信者）
+users 1--* direct_messages  # via direct_messages.recipient_id（受信者）
+users 1--* notifications    # via notifications.actor_user_id（行為者）
+users 1--* notifications    # via notifications.user_id（通知の受け手）
+
+# 2) Tweets起点（ツイートが“受ける”側の関係をまとめる）
+tweets 1--* likes
+tweets 1--* retweets
+tweets 1--* bookmarks
+tweets ?--* notifications    # ツイートに紐づかない通知もあるので「?」
+
+# 3) 自己参照（リプライ木）
+tweets ?--* tweets           # 親ツイートは0/1、子（リプライ）は0..*
+
+# 4) Direct_message起点
+direct_message 1--1 notifications
+
+# Cardinality    Syntax
+# 0 or 1         ?
+# exactly 1      1
+# 0 or more      *
+# 1 or more      +
