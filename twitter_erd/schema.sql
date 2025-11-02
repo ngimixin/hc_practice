@@ -22,7 +22,7 @@ CREATE TABLE tweets (
   id                   BIGSERIAL PRIMARY KEY,
   user_id              BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   body                 VARCHAR(140) NOT NULL,
-  in_reply_to_tweet_id BIGINT NULL REFERENCES tweets(id) ON DELETE SET NULL,   -- 親ツイート（返信先）を参照
+  parent_tweet_id      BIGINT NULL REFERENCES tweets(id) ON DELETE SET NULL,   -- 親ツイート（返信先）を参照
   created_at           TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at           TIMESTAMP NOT NULL DEFAULT NOW()
 );
