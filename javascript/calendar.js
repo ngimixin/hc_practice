@@ -11,6 +11,12 @@
 // 曜日見出し（日曜始まり）
 const WEEK_HEADER = "日 月 火 水 木 金 土";
 
+// カレンダー表示のレイアウト定数
+const CAL_COLUMNS = 7;
+const CAL_ROWS = 6;
+const CAL_WIDTH = 20;
+const EMPTY_CELL = "  ";
+
 // 反転表示（ANSIエスケープ）
 const Color = {
   REVERSE: "\x1b[07m", // 文字色と背景色を反転
@@ -25,8 +31,11 @@ const Color = {
  *   今月（今年）を表示し、今日の日付をハイライト
  * - `-m <1..12>`:
  *   指定月（今年）を表示。指定月が今月なら今日をハイライト、それ以外はハイライトしない
- * - 不正月:
- *   "<入力> is neither a month number (1..12) nor a name" を出して終了(1)
+ * - エラー時:
+ *   * `-m` 以外のオプションが来たら: "illegal option -- <option>" を表示して終了(1)
+ *   * `-m` の値が無い、または `-m <month>` の後に追加引数がある: "invalid command" を表示して終了(1)
+ *   * `-m` の値が数値でない、または 1..12 範囲外:
+ *     "is neither a month number (1..12) nor a name" を表示して終了(1)
  *
  * Returns:
  *   { year: number, month: number, highlightDay: number | null }
@@ -39,21 +48,34 @@ function parseArgs() {
   const thisDay = today.getDate();
 
   // process.argv: [node, script, ...args]
-  const args = process.argv.slice(2);
+  const [, , option, rawMonth] = process.argv;
 
-  if (args.length === 0) {
-    // 引数なし
+  // 引数なし
+  if (!option) {
     return { year: thisYear, month: thisMonth, highlightDay: thisDay };
   }
 
-  // `-m <month>` のみ許可
-  if (!(args.length === 2 && args[0] === "-m")) {
-    const bad = args[0] ?? "";
-    console.error(`${bad} is neither a month number (1..12) nor a name`);
+  // 余計な引数あり
+  if (process.argv.length > 4) {
+    console.error("invalid command");
     process.exit(1);
   }
 
-  const rawMonth = args[1];
+  // オプションが `-m` でない
+  if (option !== "-m") {
+    if (option.startsWith("-")) {
+      console.error(`illegal option -- ${option.slice(1)}`);
+    } else {
+      console.error("invalid command");
+    }
+    process.exit(1);
+  }
+
+  // 月の値がない
+  if (!rawMonth) {
+    console.error("invalid command");
+    process.exit(1);
+  }
 
   // 数値として解釈（"06" などもOKにする）
   // ※正規表現で整数かどうかを厳密に見る
@@ -118,20 +140,21 @@ function generateMonthlyWeeks(firstWeekday, endOfMonth, highlightDay) {
     return cell;
   };
 
-  // 先頭の空きを firstWeekday 個だけ "  " で埋める（= 1日が始まる曜日まで埋める）
+  // 先頭の空きを firstWeekday 個だけ EMPTY_CELL で埋める（= 1日が始まる曜日まで埋める）
   const days = Array(firstWeekday)
-    .fill("  ")
+    .fill(EMPTY_CELL)
     .concat(Array.from({ length: endOfMonth }, (_, i) => fmt(i + 1)));
 
-  // 42セルまで埋める（cal風に6行固定）
-  while (days.length < 42) {
-    days.push("  ");
+  // CAL_COLUMNS×CAL_ROWS セルまで埋める（cal風に6行固定）
+  const totalCells = CAL_COLUMNS * CAL_ROWS;
+  while (days.length < totalCells) {
+    days.push(EMPTY_CELL);
   }
 
-  // 7日ごとに切って6行作る
+  // CAL_COLUMNS 日ごとに切って CAL_ROWS 行作る
   const weeks = [];
-  for (let i = 0; i < 42; i += 7) {
-    weeks.push(days.slice(i, i + 7));
+  for (let i = 0; i < totalCells; i += CAL_COLUMNS) {
+    weeks.push(days.slice(i, i + CAL_COLUMNS));
   }
   return weeks;
 }
@@ -146,8 +169,8 @@ function generateMonthlyWeeks(firstWeekday, endOfMonth, highlightDay) {
  */
 function printCalendar(year, month, weeks) {
   const title = `${month}月 ${year}`
-    .padStart(Math.floor((20 + `${month}月 ${year}`.length) / 2), " ")
-    .padEnd(20, " ");
+    .padStart(Math.floor((CAL_WIDTH + `${month}月 ${year}`.length) / 2), " ")
+    .padEnd(CAL_WIDTH, " ");
   console.log(title);
   console.log(WEEK_HEADER);
   for (const w of weeks) {
